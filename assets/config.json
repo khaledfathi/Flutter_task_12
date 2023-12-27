@@ -1,0 +1,10 @@
+{
+    "database": {
+        "DBMS":"sqlite",
+        "databaseName" : "my_db.db",
+        "host" : "", 
+        "port" : 3306,
+        "userName" : "",
+        "password" : ""
+    }
+}
