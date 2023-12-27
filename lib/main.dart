@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_task_12/core/config/app_config.dart';
+import 'package:flutter_task_12/core/provider/global_providers/global_provider.dart';
 import 'package:flutter_task_12/core/routes/routes_handler.dart';
-import 'package:flutter_task_12/src/views/splash/splash_screen.dart';
+import 'package:flutter_task_12/core/themes/main_theme.dart';
+import 'package:flutter_task_12/src/views/login/login_screen.dart';
+import 'package:provider/provider.dart';
 
 void main ()async{
   await AppConfig().apply();
@@ -13,10 +16,16 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      initialRoute: SplashScreen.route,
-      onGenerateRoute: RouteHandler.generateRoutes,
+    return  MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context)=>GlobalProvider()),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: MainTheme.apply,
+        initialRoute: LoginScreen.route,
+        onGenerateRoute: RouteHandler.generateRoutes,
+      ),
     );
   }
 }

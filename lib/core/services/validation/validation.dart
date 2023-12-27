@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_task_12/core/globals/globals.dart';
+// import 'package:flutter_task_12/core/globals/globals.dart';
+import '../../globals/globals.dart' as globals; 
 
 class Validation {
   String text;
@@ -46,7 +47,7 @@ class Validation {
   }
 
   Future<Validation> unique(String table, String column) async {
-    await appDatabase
+    await globals.appDatabase
         .table(table)
         .selectWhere('$column  = ?', [text]).then((queryResult) {
       _unique = queryResult.isEmpty;
