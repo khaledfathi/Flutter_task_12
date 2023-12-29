@@ -5,5 +5,5 @@ import '../services/database/interface/database_core_interface.dart';
 
 late DatabaseCoreInterface appDatabase ; 
 late SharedPreferences sharedPreferences ;
-late Dio dio ;
+late Dio api ;
 late String appDirPath  ; 

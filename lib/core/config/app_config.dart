@@ -38,19 +38,20 @@ class AppConfig {
       case 'sqlite':
         globals.appDatabase = DatabaseSqlite();
         debugPrint('AppConfig : Database initilizing with DMBS = sqlite [OK]');
-      // case 'api': globals.appDatabase = DatabaseApi();
     }
   }
 
   //init shared preference
   Future<void> _initSharedPreference() async {
     globals.sharedPreferences = await SharedPreferences.getInstance();
-    debugPrint('AppConfig : Shared Preferences initilaizing  [OK]');
+    await globals.sharedPreferences.setBool('isLogin' , false); 
+    debugPrint('AppConfig : Shared Preferences initilaizing  [OK]');    
+    debugPrint('AppConfig : Shared Prefrences set (isLogin = false) [OK]');    
   }
 
   //init DIO
   void _initDio() {
-    globals.dio = Dio();
+    globals.api = Dio();
     debugPrint('AppConfig : Dio (http communications) initilaizing  [OK]');
   }
 

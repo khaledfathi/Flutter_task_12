@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_task_12/core/config/app_config.dart';
-import 'package:flutter_task_12/core/provider/global_providers/global_provider.dart';
+import 'package:flutter_task_12/core/states/global_states/global_state.dart';
 import 'package:flutter_task_12/core/routes/routes_handler.dart';
+import 'package:flutter_task_12/core/states/login_screen_states/login_screen_login_state.dart';
+import 'package:flutter_task_12/core/states/login_screen_states/login_screen_password_state.dart';
 import 'package:flutter_task_12/core/themes/main_theme.dart';
-import 'package:flutter_task_12/src/views/login/login_screen.dart';
+import 'package:flutter_task_12/src/views/signup/sign_up_screen.dart';
 import 'package:provider/provider.dart';
 
 void main ()async{
@@ -18,12 +20,12 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return  MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context)=>GlobalProvider()),
+        ChangeNotifierProvider(create: (context)=>GlobalState()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: MainTheme.apply,
-        initialRoute: LoginScreen.route,
+        initialRoute: SignUpScreen.route,
         onGenerateRoute: RouteHandler.generateRoutes,
       ),
     );

@@ -37,6 +37,10 @@ class Validation {
   }
 
   Validation numeric() {
+    if (text.isEmpty){//nullable case 
+      _numeric = true;
+      return this; 
+    }
     try {
       int.parse(text);
     } catch (e) {
@@ -47,6 +51,10 @@ class Validation {
   }
 
   Future<Validation> unique(String table, String column) async {
+    if (text.isEmpty){//nullable case 
+      _unique = true;
+      return this; 
+    }
     await globals.appDatabase
         .table(table)
         .selectWhere('$column  = ?', [text]).then((queryResult) {
@@ -63,6 +71,10 @@ class Validation {
   }
 
   Validation email() {
+    if (text.isEmpty){//nullable case 
+      _email = true;
+      return this; 
+    }
     _email = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$', caseSensitive: false)
         .hasMatch(text);
     _email ? null : _errors.add('$fieldName is invalid email address');
@@ -70,6 +82,10 @@ class Validation {
   }
 
   Validation date() {
+    if (text.isEmpty){//nullable case 
+      _date = true;
+      return this; 
+    }
     _date = RegExp(r'^\d{2}/\d{2}/\d{4}$').hasMatch(text);
     //convert date format to ISO8601
     String dateISO8601 = text.split('/').reversed.toList().join('-');
@@ -85,6 +101,10 @@ class Validation {
   }
 
   Validation time() {
+    if (text.isEmpty){//nullable case 
+      _time = true;
+      return this; 
+    }
     _time = RegExp(r'^([0-1][0-9]|2[0-3]):[0-5][0-9]$').hasMatch(text);
     _time ? null : _errors.add('$fieldName is Invalid');
     return this;
