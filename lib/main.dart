@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_task_12/core/config/app_config.dart';
-import 'package:flutter_task_12/core/states/global_states/global_state.dart';
-import 'package:flutter_task_12/core/routes/routes_handler.dart';
-import 'package:flutter_task_12/core/states/login_screen_states/login_screen_login_state.dart';
-import 'package:flutter_task_12/core/states/login_screen_states/login_screen_password_state.dart';
-import 'package:flutter_task_12/core/themes/main_theme.dart';
+import 'package:flutter_task_12/src/views/main/main_screen.dart';
 import 'package:flutter_task_12/src/views/signup/sign_up_screen.dart';
-import 'package:provider/provider.dart';
+//core
+import 'package:flutter_task_12/core/core_export.dart';
 
-void main ()async{
+void main() async {
   await AppConfig().apply();
-  runApp(const App()); 
+  runApp(const App());
 }
 
 class App extends StatelessWidget {
@@ -18,16 +14,25 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context)=>GlobalState()),
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: MainTheme.apply,
-        initialRoute: SignUpScreen.route,
-        onGenerateRoute: RouteHandler.generateRoutes,
-      ),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: MainTheme.apply,
+      initialRoute: _initRoute(),
+      onGenerateRoute: RouteHandler.generateRoutes,
     );
+  }
+
+  String _initRoute() {
+    bool? isLogin = sharedPreferences.getBool(IS_LOGIN);
+    if (isLogin != null) {
+      if (isLogin) {
+        //generate current user model 
+        Auth.setCurrentUser();
+        return MainScreen.route;
+      } else {
+        return SignUpScreen.route;
+      }
+    }
+    return SignUpScreen.route;
   }
 }

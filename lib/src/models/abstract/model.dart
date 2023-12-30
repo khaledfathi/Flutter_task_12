@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/globals/globals.dart' as globals;
+import '../../../core/core_export.dart';
 
 abstract class Model<T> {
   String tableName;
@@ -11,13 +11,13 @@ abstract class Model<T> {
   Future<List<T>> select({int? id}) async {
     List<T> records = [];
     if (id == null) {
-      await globals.appDatabase.table(tableName).select().then((queryResult) {
+      await appDatabase.table(tableName).select().then((queryResult) {
         if (queryResult.isNotEmpty) {
           records = createQueryModelList(queryResult);
         }
       });
     } else {
-      await globals.appDatabase
+      await appDatabase
           .table(tableName)
           .select(id: id)
           .then((queryResult) {
@@ -31,7 +31,7 @@ abstract class Model<T> {
 
   Future<List<T>> selectWhere(String where, List<Object?> whereArgs) async {
     List<T> records = [];
-    await globals.appDatabase
+    await appDatabase
         .table(tableName)
         .selectWhere(where, whereArgs)
         .then((queryResult) {
@@ -44,7 +44,7 @@ abstract class Model<T> {
 
   Future<int> insert() async {
     try {
-      return globals.appDatabase.table(tableName).insert(row);
+      return appDatabase.table(tableName).insert(row);
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -55,7 +55,7 @@ abstract class Model<T> {
     Map<String, dynamic> newRow = {};
     row!.forEach((key, value) => value.isNotEmpty ? newRow[key] = value : null);
     try {
-      return globals.appDatabase.table(tableName).update(newRow, id);
+      return appDatabase.table(tableName).update(newRow, id);
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -65,19 +65,19 @@ abstract class Model<T> {
   Future<int> updateWhere(String where, List<Object?> whereArgs) async {
     Map<String, dynamic> newRow = {};
     row!.forEach((key, value) => value.isNotEmpty ? newRow[key] = value : null);
-    return globals.appDatabase.table(tableName).update(where, whereArgs);
+    return appDatabase.table(tableName).update(where, whereArgs);
   }
 
   Future<int> delete({int? id}) {
     if (id == null) {
-      return globals.appDatabase.table(tableName).delete();
+      return appDatabase.table(tableName).delete();
     } else {
-      return globals.appDatabase.table(tableName).delete(id: id);
+      return appDatabase.table(tableName).delete(id: id);
     }
   }
 
   Future<int> deleteWhere(String where, List<Object?> whereArgs) {
-    return globals.appDatabase.table(tableName).delete(where, whereArgs);
+    return appDatabase.table(tableName).delete(where, whereArgs);
   }
 
   Map<String, dynamic> toMap();

@@ -1,22 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_task_12/core/states/login_screen_states/login_screen_login_state.dart';
-import 'package:flutter_task_12/core/states/login_screen_states/login_screen_password_state.dart';
-import 'package:flutter_task_12/core/services/validation/validation.dart';
-import 'package:flutter_task_12/src/controllers/login/login_controller.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_task_12/core/custom_widgets/headers/custom_header_text.dart';
+import 'package:flutter_task_12/src/controllers/login/cubit/email_validate_sign_cubit.dart';
+import 'package:flutter_task_12/src/controllers/login/cubit/login_cubit.dart';
+import 'package:flutter_task_12/src/controllers/login/cubit/password_visibility_cubit.dart';
 import 'package:flutter_task_12/src/views/forget_password/forget_password_screen.dart';
-import 'package:flutter_task_12/src/views/login/components/login_screen_forget_password.dart';
-import 'package:flutter_task_12/src/views/login/components/login_screen_header.dart';
-import 'package:flutter_task_12/src/views/login/components/login_screen_input_email.dart';
-import 'package:flutter_task_12/src/views/login/components/login_screen_input_password.dart';
-import 'package:flutter_task_12/src/views/login/components/login_screen_login_button.dart';
-import 'package:flutter_task_12/src/views/login/components/login_screen_social_media_block.dart';
-import 'package:flutter_task_12/src/views/main/main_screen.dart';
-import 'package:provider/provider.dart';
+//core
+import 'package:flutter_task_12/core/core_export.dart';
+//screen components
+import 'package:flutter_task_12/src/views/login/components/login_screen_components_export.dart';
 
 class LoginScreen extends StatelessWidget {
   static const String route = 'login';
-  //screen controller
-  final LoginController controller = LoginController();
+  //controllers
   //keys
   final GlobalKey<FormState> formKey = GlobalKey();
   //inputs controllers
@@ -30,35 +26,49 @@ class LoginScreen extends StatelessWidget {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(),
-      body: MultiProvider(
+      body: MultiBlocProvider(
         providers: [
-          ChangeNotifierProvider(
-              create: (context) => LoginScreenPasswordState()),
-          ChangeNotifierProvider(create: (context) => LoginScreenLoginState()),
+          BlocProvider(create: (context) => LoginCubit(),),
+          BlocProvider(create: (context) => EmailValidateSignCubit(),),
+          BlocProvider(create: (context) => PasswordVisibilityCubit(),),
         ],
         child: Form(
           key: formKey,
-          autovalidateMode: AutovalidateMode.always,
           child: Column(
             children: [
               //title
-              const LoginScreenHeader(),
+              const CustomHeaderText(title: 'Login',),
 
               //inputs
-              LoginScreenInputEmail(
-                controller: emailController,
-                validator: (email) => emailValidation(email!),
-              ),
-              Consumer<LoginScreenPasswordState>(
-                  builder: (context, state, child) {
-                return LoginScreenInputPassword(
-                  controller: passwordController,
-                  validator: (password) => passwordValidation(password!),
-                  obscureText: state.passwordHide,
-                  suffixButtonIconData: state.passwordVisibilityIcon,
-                  onTapSuffixButton: () => state.passwordVisibilityToggle(),
-                );
-              }),
+              //email
+              BlocConsumer<EmailValidateSignCubit , EmailValidateSignState>(
+                  builder: (context, state) {
+                    return LoginScreenInputEmail(
+                      controller: emailController,
+                      validator: (email) => emailValidation(email!),
+                      suffixIcon: state is EmailValid ? const Icon(Icons.check) : null, 
+                      suffixIconColor: state is EmailValid ? Colors.green : Colors.red, 
+                      onChanged: (email)=> EmailValidateSignCubit.get(context).checkEmail(email!),
+                    );
+                  },
+                  listener: (context, state) {}),
+
+              //password
+              BlocConsumer<PasswordVisibilityCubit, PasswordVisibilityState>(
+                  builder: (context, state) {
+                    PasswordVisibilityCubit cubit =
+                        PasswordVisibilityCubit.get(context);
+                    return LoginScreenInputPassword(
+                      controller: passwordController,
+                      validator: (password) => passwordValidation(password!),
+                      obscureText: cubit.hidePassword,
+                      suffixButtonIconData: cubit.hidePassword
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      onTapSuffixButton: () => cubit.passwordVisibaleToggle(),
+                    );
+                  },
+                  listener: (context, state) {}),
 
               //forget password button
               LoginScreenForgetPassword(
@@ -67,41 +77,29 @@ class LoginScreen extends StatelessWidget {
               ),
 
               //login button
-              Consumer<LoginScreenLoginState>(builder: (context, state, child) {
-                return LoginScreenLoginButton(onPressed: () async {
-                  if (formKey.currentState!.validate()) {
-                    state.changeToLoginValid();
-                    state.changeToLoading();
-                    await controller
-                        .login(
-                            context: context,
-                            email: emailController.text,
-                            password: passwordController.text)
-                        .then((isLogin) {
-                      if (isLogin) {
-                        state.changeToNotLoading();
-                        Navigator.pushNamed(context, MainScreen.route);
-                      } else {
-                        state.changeToNotLoading();
-                        state.changeToLoginInvalid();
+              BlocConsumer<LoginCubit, LoginState>(
+                  builder: (context, state) {
+                    return LoginScreenLoginButton(onPressed: () {
+                      if (formKey.currentState!.validate()) {
+                        BlocProvider.of<LoginCubit>(context).login(context,
+                            emailController.text, passwordController.text);
                       }
                     });
+                  },
+                  listener: (context, state) {}),
+
+              // lodaing sign
+              BlocConsumer<LoginCubit, LoginState>(
+                listener: (context, state) {},
+                builder: (context, state) {
+                  if (state is LoginLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else {
+                    return Text(
+                        BlocProvider.of<LoginCubit>(context).loginErrorMessage);
                   }
-                });
-              }),
-              //lodaing sign
-              Consumer<LoginScreenLoginState>(builder: (context, state, child) {
-                return SizedBox(
-                  child:
-                      state.loading ? const CircularProgressIndicator() : null,
-                );
-              }),
-              Consumer<LoginScreenLoginState>(builder: (context, state, child) {
-                return SizedBox(
-                  child:
-                      state.loginCase != null ? Text(state.loginCase!) : null,
-                );
-              }),
+                },
+              ),
 
               //social media box
               LoginScreenSocialMediaBlock(
@@ -116,14 +114,19 @@ class LoginScreen extends StatelessWidget {
   }
 
   String? passwordValidation(String password) {
-    Validation valid = Validation(password, fieldName: 'password').length(minLength: 3).required().validate();
+    Validation valid = Validation(password, fieldName: 'password')
+        .length(minLength: 3)
+        .required()
+        .validate();
     if (!valid.isValid) {
       return valid.errors.first;
     }
     return null;
   }
+
   String? emailValidation(String email) {
-    Validation valid = Validation(email, fieldName: 'Email').email().required().validate();
+    Validation valid =
+        Validation(email, fieldName: 'Email').email().required().validate();
     if (!valid.isValid) {
       return valid.errors.first;
     }

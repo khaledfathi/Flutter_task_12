@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 
-class LoginScreenHeader extends StatelessWidget {
-  const LoginScreenHeader({super.key});
+class CustomHeaderText extends StatelessWidget {
+  final String title ; 
+  final EdgeInsets? margin; 
+  const CustomHeaderText({super.key, 
+    required this.title,
+    this.margin, 
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       height: 50,
-      margin: const EdgeInsets.only(bottom: 40),
+      margin:margin ?? const EdgeInsets.only(bottom: 40),
       padding: const EdgeInsets.only(left: 10),
-      child: Text(
-        'Login',
+      child: Text( title,
         style: Theme.of(context).textTheme.titleLarge,
       ),
     );

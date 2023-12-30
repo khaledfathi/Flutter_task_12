@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../services/database/database_sqlite.dart';
-import '../globals/globals.dart' as globals;
+import '../core_export.dart' as core;
 
 class AppConfig {
   static late Map config;
@@ -36,28 +35,26 @@ class AppConfig {
   Future<void> _initDB() async {
     switch (config['database']['DBMS']) {
       case 'sqlite':
-        globals.appDatabase = DatabaseSqlite();
+        core.appDatabase = core.DatabaseSqlite();
         debugPrint('AppConfig : Database initilizing with DMBS = sqlite [OK]');
     }
   }
 
   //init shared preference
   Future<void> _initSharedPreference() async {
-    globals.sharedPreferences = await SharedPreferences.getInstance();
-    await globals.sharedPreferences.setBool('isLogin' , false); 
+    core.sharedPreferences = await SharedPreferences.getInstance();
     debugPrint('AppConfig : Shared Preferences initilaizing  [OK]');    
-    debugPrint('AppConfig : Shared Prefrences set (isLogin = false) [OK]');    
   }
 
   //init DIO
   void _initDio() {
-    globals.api = Dio();
+    core.api = Dio();
     debugPrint('AppConfig : Dio (http communications) initilaizing  [OK]');
   }
 
   Future<void> _initAppPath() async {
     await getApplicationDocumentsDirectory()
-        .then((direcrory) => globals.appDirPath = direcrory.path);
+        .then((direcrory) => core.appDirPath = direcrory.path);
       debugPrint('AppConfig : device path initilaizing  [OK]');
   }
 }
